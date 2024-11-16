@@ -1,46 +1,104 @@
 import re
 from playwright.sync_api import Page, expect
 from enum import Enum
-
-def test_login_feature(page:Page):
-
-    class Buyer(Enum):
-        firstName = 'Alsaggaf'
-        lastName = 'Obi'
-        postalCode = 20987
+from models import PlaceOrder
 
 
 
+def test_login_feature(page:Page):  
 
-    navTitle = "Swag Labs"
-    userName = "standard_user"
-    userPassword = "secret_sauce"
-    item = "Sauce Labs Backpack"
-    buttonType = "Add to cart"
-    buttonType2 = "Checkout"
-    page.goto("https://www.saucedemo.com/inventory.html")
-    expect(page.locator('[class="login_logo"]')).to_have_text(navTitle)
-    page.locator('[id="user-name"]').fill(userName)
-    page.locator('[id="password"]').fill(userPassword)
-    page.locator('[id="login-button"]').click()
-    # expect(page.locator('[id="inventory_container"]')).to_be_visible()
-    expect(page.locator('[id="inventory_container"]').nth(1)).to_be_visible()
-    # page.locator('Ok').click()
-    productName = page.locator('[data-test="inventory-item"]')
-    productLink = page.get_by_role("link",name=item)
-    chooseProduct = productName.filter(has=productLink)
-    chooseProduct.get_by_role("button", name=buttonType).click()
-    shoppingCart = page.locator('[id="shopping_cart_container"]')
-    shoppingCart.locator('[class="shopping_cart_link"]').click()
-    page.get_by_role("button",name=buttonType2).click()
-    # page.pause()
-    expect(page.locator('[id="checkout_info_container"]')).to_be_visible()
+    person ={
+        "firstname":"Edwin",
+        "lastname":"Levante",
+        "postalcode": "20987"
+     
+}
+    
+    class Details_Login(Enum):
+        loginName = "standard_user"
+        loginPassword = "secret_sauce"
 
-    page.locator('[id="first-name"]').fill(Buyer.firstName.value)
 
-    page.locator('[id="last-name"]').fill(Buyer.lastName.value)
+    item =  "Sauce Labs Backpack" 
+    button_type="Add to cart" 
+    button_typeOut="Checkout" 
 
-    page.locator('[id="postal-code"]').fill(str(Buyer.postalCode.value))
+
+    
+        # Create the page object
+    place_order = PlaceOrder(page)
+
+        # Step 1: Navigate to the login page
+    place_order.navigate("Swag Labs")
+
+        # Step 2: Log in to the application
+    place_order.login(Details_Login.loginName.value, Details_Login.loginPassword.value)
+
+        # Step 3: Search for an item and add it to the cart
+    place_order.search_and_add_to_cart(item, button_type)
+
+        # Step 4: Proceed to checkout and fill buyer details
+    place_order.proceed_to_checkout(
+            button_typeOut,    
+            person["firstname"],
+            person["lastname"],
+            person["postalcode"]
+        )
+
+
+
+
+
+
+
+
+
+
+
+
+
+# def test_login_feature(page:Page):
+
+#     class Buyer(Enum):
+#         firstName = 'Alsaggaf'
+#         lastName = 'Obi'
+#         postalCode = 20987
+
+
+
+
+#     navTitle = "Swag Labs"
+#     userName = "standard_user"
+#     userPassword = "secret_sauce"
+#     item = "Sauce Labs Backpack"
+#     buttonType = "Add to cart"
+#     buttonType2 = "Checkout"
+
+
+    # page.goto("https://www.saucedemo.com/inventory.html")
+    # expect(page.locator('[class="login_logo"]')).to_have_text(navTitle)
+    # page.locator('[id="user-name"]').fill(userName)
+    # page.locator('[id="password"]').fill(userPassword)
+    # page.locator('[id="login-button"]').click()
+    # # expect(page.locator('[id="inventory_container"]')).to_be_visible()
+    # expect(page.locator('[id="inventory_container"]').nth(1)).to_be_visible()
+    # # page.locator('Ok').click()
+    # productName = page.locator('[data-test="inventory-item"]')
+    # productLink = page.get_by_role("link",name=item)
+    # chooseProduct = productName.filter(has=productLink)
+    # chooseProduct.get_by_role("button", name=buttonType).click()
+    # shoppingCart = page.locator('[id="shopping_cart_container"]')
+    # shoppingCart.locator('[class="shopping_cart_link"]').click()
+    # page.get_by_role("button",name=buttonType2).click()
+    # # page.pause()
+    # expect(page.locator('[id="checkout_info_container"]')).to_be_visible()
+
+    # page.locator('[id="first-name"]').fill(Buyer.firstName.value)
+
+    # page.locator('[id="last-name"]').fill(Buyer.lastName.value)
+
+    # page.locator('[id="postal-code"]').fill(str(Buyer.postalCode.value))
+
 
 
 
@@ -111,15 +169,3 @@ def test_multiple_order_feature(page: Page):
                 break  # Exit inner loop on
 
             
-
-             
-             
-
-
-
-    # for i in productCount:
-    #     productContainer = page.locator('[data-test="inventory-item"]').filter(has=productName).nth(i)
-    #     productInfo =  productContainer.locator('.inventory_item_name').textContent()
-
-    #     if productInfo == "Sauce Labs Backpack":
-    #         productContainer.get_by_role("button",name="Add to cart").click()
